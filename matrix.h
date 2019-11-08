@@ -70,7 +70,7 @@ public:
                     if((temp2->next->posx)!=x){
                         Node<T>* prevtemp=temp->next;
                         temp2->next=inserted;
-                        temp2->down->next=prevtemp;
+                        temp2->next->next=prevtemp;
                     }
                 }
                 else{
