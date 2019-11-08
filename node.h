@@ -6,17 +6,22 @@ class Matrix;
 
 template <typename T>
 class Node {
+private:
 protected:
+    T nvalue;
     Node<T> *next, *down;
     int posx=0,posy=0;
-    T value;
+    T* value;
 public:
     Node(){
         posx=-1;
         posy=-1;
-        value=-1;
+        value=nullptr;
     }
-    Node (unsigned int posx, unsigned int posy,T value):value(value),next(nullptr),down(nullptr),posx(posx),posy(posy){};
+    Node (unsigned int posx, unsigned int posy,T valuee):next(nullptr),down(nullptr),posx(posx),posy(posy){
+        nvalue=valuee;
+        value=&nvalue;
+    };
     void set_down(Node<T> nodo){
         down=nodo;
     }

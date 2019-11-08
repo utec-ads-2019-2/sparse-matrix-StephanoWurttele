@@ -5,7 +5,7 @@
 int main() {
     //Tester::execute();
     Matrix<int> SparseMatrix(4,4);
-    SparseMatrix.set(0,2,2);
+    SparseMatrix.set(0,2,-1);
     cout<<"Node 2 added"<<endl;
     SparseMatrix.set(0,0,1);
     cout<<"Node 1 added"<<endl;

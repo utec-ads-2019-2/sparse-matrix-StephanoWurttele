@@ -14,7 +14,6 @@ public:
 
     void addNode(unsigned x, unsigned y, Node<T>* inserted){
         cout<<"In add Node"<<endl;
-        cout<<inserted->value<<endl;
         //Column{}
             Node<T>* temp=row[x];
             cout<<"Temp is ";
@@ -38,7 +37,7 @@ public:
             }
             if(temp->down){
                 if((temp->down->posy)==y){
-                    temp->down->value=inserted->value;
+                    temp->down->nvalue=inserted->nvalue;
                 }
                 else{
                     Node<T>* prevtemp=temp->down;
@@ -79,7 +78,6 @@ public:
         if(temp->down){
             if(temp->posy!=y){
                 while(temp){
-                    cout<<"Temp is now "<<temp->value<<endl;
                     if(temp->down){
                         cout<<"There is down"<<endl;
                         if(temp->down->posy==y && temp->down->posx==x){
@@ -101,7 +99,6 @@ public:
                         return;
                     }
                 }
-                cout<<"Temp after while is "<<temp->value<<endl;
                 if(temp->down->posy==y){
                     Node<T>* todelete=temp->down;
                     Node<T>* newdown=temp->down->down;
@@ -150,7 +147,7 @@ void print(){
                 for (int i=contador;i<it2->posx;i++){
                     cout<<0<<" ";
                 }
-                cout<<it2->value<<" ";
+                cout<<*(it2->value)<<" ";
                 contador=it2->posx+1;
                 it2=it2->next;
             }
