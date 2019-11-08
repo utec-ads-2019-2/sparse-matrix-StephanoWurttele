@@ -13,77 +13,73 @@ public:
     vector<Node<T>*> column;
 
     void addNode(unsigned x, unsigned y, Node<T>* inserted){
-        cout<<inserted<<endl;
+        cout<<"In add Node"<<endl;
+        cout<<inserted->value<<endl;
         //Column{}
             Node<T>* temp=row[x];
-            if(!temp){
-                row[x]=inserted;
-            }
-            else{
-                for(int i=0;i<x-1;x++){
-                    if(temp->down){
-                        if(temp->down->posy<y)
-                            temp=temp->down;
-                        else{
-                            break;
-                        }
+            cout<<"Temp is ";
+            cout<<temp<<endl;
+            for(int i=0;i<x-1;x++){
+                if(temp->down){
+                    cout<<"Temp down found"<<endl;
+                    if(temp->down->posy<y){
+                        cout<<"Advancing"<<endl;
+                        temp=temp->down;
                     }
                     else{
+                        cout<<"Broke!"<<endl;
                         break;
                     }
                 }
-                if(temp->down){
-                    if((temp->down->posy)==y){
-                        temp->down->value=inserted->value;
-                    }
-                    else{
-                        Node<T>* prevtemp=temp->down;
-                        temp->down=inserted;
-                        temp->down->down=prevtemp;
-                    }
+                else{
+                    cout<<"No temp down!"<<endl;
+                    break;
+                }
+            }
+            if(temp->down){
+                if((temp->down->posy)==y){
+                    temp->down->value=inserted->value;
                 }
                 else{
+                    Node<T>* prevtemp=temp->down;
+                    inserted->down=prevtemp;
                     temp->down=inserted;
                 }
             }
-
+            else{
+                temp->down=inserted;
+            }
         //Row{}
             Node<T>* temp2=column[y];
-            if(!temp2){
-                column[y]=inserted;
-                return;
-            }
-            else{
-                for(int i=0;i<y-1;y++){
-                    if(temp2->next){
-                        if(temp2->next->posx<=x)
-                            temp2=temp2->next;
-                        else{
-                            break;
-                        }
-                    }
+            for(int i=0;i<y-1;y++){
+                if(temp2->next){
+                    if(temp2->next->posx<x)
+                        temp2=temp2->next;
                     else{
                         break;
                     }
                 }
-                if(temp2->next){
-                    if((temp2->next->posx)!=x){
-                        Node<T>* prevtemp=temp->next;
-                        temp2->next=inserted;
-                        temp2->down->next=prevtemp;
-                    }
-                }
                 else{
-                    temp2->next=inserted;
+                    break;
                 }
+            }
+            if(temp2->next){
+                if((temp2->next->posx)!=x){
+                    Node<T>* prevtemp=temp->next;
+                    temp2->next=inserted;
+                    temp2->next->next=prevtemp;
+                }
+            }
+            else{
+                temp2->next=inserted;
             }
     }
     void delNode(unsigned x,unsigned y){
         Node<T>* temp=row[x];
-        if(temp){
+        if(temp->down){
             if(temp->posy!=y){
                 while(temp){
-                    cout<<"Temp is now "<<temp<<endl;
+                    cout<<"Temp is now "<<temp->value<<endl;
                     if(temp->down){
                         cout<<"There is down"<<endl;
                         if(temp->down->posy==y && temp->down->posx==x){
@@ -92,8 +88,9 @@ public:
                         }
                         else{
                             if(temp->down->posy<y){
-                                cout<<"Down is smaller than current";
+                                cout<<"Down with "<<temp->down<<" is smaller than current"<<endl;
                                 temp=temp->down;
+                                cout<<"Replaced temp with "<<temp;
                             }
                             else{
                                 return;
@@ -104,8 +101,8 @@ public:
                         return;
                     }
                 }
-                cout<<"Temp after while is "<<temp<<endl;
-                if(temp->posy==y){
+                cout<<"Temp after while is "<<temp->value<<endl;
+                if(temp->down->posy==y){
                     Node<T>* todelete=temp->down;
                     Node<T>* newdown=temp->down->down;
                     Node<T>* temp2=column[y];
@@ -118,26 +115,16 @@ public:
                     delete todelete;
                 }
             }
-            else{
-                cout<<"forcecode"<<endl;
-                Node<T>* newroot=temp->down;
-                Node<T>* temp2=column[y];
-                while(temp2->posx!=x){
-                    temp2=temp2->next;
-                }
-                Node<T>* newnext=temp2->next;
-                delete temp;
-                row[x]=newroot;
-                column[y]=newnext;
-            }
-            return;
         }
-        cout<<"lmao"<<endl;
     }
 public:
     Matrix(unsigned rows, unsigned columns):rows(rows),columns(columns){
-        row.resize(rows);
-        column.resize(columns);
+        for(int i=0;i<rows;i++){
+            column.push_back(new Node<T>());
+        }
+        for(int i=0;i<columns;i++){
+            row.push_back(new Node<T>());
+        }
     };
 
     void set(unsigned x, unsigned y, T data){
@@ -158,13 +145,14 @@ void print(){
         //for (auto it=column.begin();it!=column.end();it++){
         for (auto it:column){
             int contador=0;
-            while (it){
-                for (int i=contador;i<it->posx;i++){
+            auto it2=it->next;
+            while (it2){
+                for (int i=contador;i<it2->posx;i++){
                     cout<<0<<" ";
                 }
-                cout<<it->value<<" ";
-                contador=it->posx+1;
-                it=it->next;
+                cout<<it2->value<<" ";
+                contador=it2->posx+1;
+                it2=it2->next;
             }
             for (int i=contador;i<columns;i++){
                 cout<<0<<" ";
