@@ -7,37 +7,29 @@ using namespace std;
 
 template <typename T>
 class Matrix {
+    //Matrix(const Matrix<T>& other){    other}
 public:
     unsigned rows, columns;
-    vector<Node<T>*> row;
-    vector<Node<T>*> column;
+    vector<Node<T>*>* row;
+    vector<Node<T>*>* column;
 
     void addNode(unsigned x, unsigned y, Node<T>* inserted){
-        cout<<"In add Node"<<endl;
         //Column{}
-            Node<T>* temp=row[x];
-            cout<<"Temp is ";
-            cout<<temp<<endl;
-            for(int i=0;i<x-1;x++){
+            Node<T>* temp=(*row)[x];
+            for(int i=0;i<y;i++){
                 if(temp->down){
-                    cout<<"Temp down found"<<endl;
-                    if(temp->down->posy<y){
-                        cout<<"Advancing"<<endl;
+                    if(temp->down->posy<y)
                         temp=temp->down;
-                    }
-                    else{
-                        cout<<"Broke!"<<endl;
+                    else
                         break;
-                    }
                 }
-                else{
-                    cout<<"No temp down!"<<endl;
+                else
                     break;
-                }
             }
             if(temp->down){
                 if((temp->down->posy)==y){
-                    temp->down->nvalue=inserted->nvalue;
+                    temp->down->value=inserted->value;
+                    return;
                 }
                 else{
                     Node<T>* prevtemp=temp->down;
@@ -49,60 +41,49 @@ public:
                 temp->down=inserted;
             }
         //Row{}
-            Node<T>* temp2=column[y];
-            for(int i=0;i<y-1;y++){
+            Node<T>* temp2=(*column)[y];
+            for(int i=0;i<x;i++){
                 if(temp2->next){
                     if(temp2->next->posx<x)
                         temp2=temp2->next;
-                    else{
+                    else
                         break;
-                    }
+                    
                 }
                 else{
                     break;
                 }
             }
             if(temp2->next){
-                if((temp2->next->posx)!=x){
-                    Node<T>* prevtemp=temp->next;
-                    temp2->next=inserted;
-                    temp2->next->next=prevtemp;
-                }
+                inserted->next=temp2->next;
+                temp2->next=inserted;
             }
             else{
                 temp2->next=inserted;
             }
     }
     void delNode(unsigned x,unsigned y){
-        Node<T>* temp=row[x];
+        Node<T>* temp=(*row)[x];
         if(temp->down){
             if(temp->posy!=y){
                 while(temp){
                     if(temp->down){
-                        cout<<"There is down"<<endl;
-                        if(temp->down->posy==y && temp->down->posx==x){
-                            cout<<"temp is equal to "<<y<<endl;
+                        if(temp->down->posy==y && temp->down->posx==x)
                             break;
-                        }
                         else{
-                            if(temp->down->posy<y){
-                                cout<<"Down with "<<temp->down<<" is smaller than current"<<endl;
+                            if(temp->down->posy<y)
                                 temp=temp->down;
-                                cout<<"Replaced temp with "<<temp;
-                            }
-                            else{
+                            else
                                 return;
-                            }
                         }
                     }
-                    else{
+                    else
                         return;
-                    }
                 }
                 if(temp->down->posy==y){
                     Node<T>* todelete=temp->down;
                     Node<T>* newdown=temp->down->down;
-                    Node<T>* temp2=column[y];
+                    Node<T>* temp2=(*column)[y];
                     while(temp2->next->posx!=x){
                         temp2=temp2->next;
                     }
@@ -116,11 +97,13 @@ public:
     }
 public:
     Matrix(unsigned rows, unsigned columns):rows(rows),columns(columns){
+        row=new vector<Node<T>*>;
+        column=new vector<Node<T>*>;
         for(int i=0;i<rows;i++){
-            column.push_back(new Node<T>());
+            column->push_back(new Node<T>());
         }
         for(int i=0;i<columns;i++){
-            row.push_back(new Node<T>());
+            row->push_back(new Node<T>());
         }
     };
 
@@ -132,22 +115,178 @@ public:
             addNode(x,y,inserted);
         }
         else{
-            cout<<"remove!"<<endl;
             delNode(x,y);
         }
     
     };
 
-void print(){
-        //for (auto it=column.begin();it!=column.end();it++){
-        for (auto it:column){
+    T operator()(unsigned column, unsigned row) const{
+        if(row<rows && column < columns){
+            Node<T>* temp = (*(this->row))[column];           
+            while (temp != nullptr){
+                if(temp->posy == row){
+                    return temp->value;
+                }
+                temp=temp->down;
+            }
+            throw invalid_argument("There is no element in this position");
+        }else
+            throw out_of_range("Out of range");
+    };
+    
+    Matrix<T> operator*(T scalar) const{
+        Matrix<T> answer(columns,rows);
+        for(auto it:(*column)){
+            auto it2=it->next;
+            while (it2){
+                answer.set(it2->posx,it2->posy,(it2->value)*scalar);
+                it2=it2->next;
+            }
+        }
+        return answer;
+    };
+
+    Matrix<T> operator*(Matrix<T> other) const{
+        if(this->rows!=other.columns)
+            throw invalid_argument("Invalid sizes");
+        Matrix<T> answer(rows,rows);
+        for(int i=0;i<rows;i++){
+            auto temp1=(*(this->column))[i];
+            for(int j=0;j<rows;j++){
+                auto temp2=(*(other.row))[j];
+                auto temp3=temp1->next;
+                auto temp4=temp2->down;
+                T temp=0;
+                while(temp3 && temp4){
+                    cout<<"Temp 3 value is "<<temp3->value<<" and temp4 value is "<<temp4->value<<endl;
+                    if(temp3->posx>temp4->posy){
+                        temp4=temp4->down;
+                    }
+                    else{
+                        if(temp3->posx<temp4->posy){
+                            temp3=temp3->next;
+                        }
+                        else{
+                            temp+=temp3->value*temp4->value;
+                            temp4=temp4->down;
+                            temp3=temp3->next;
+                        }
+                        
+                    }
+                }
+                answer.set(j,i,temp);
+            }
+        }
+        return answer;
+    };
+
+    Matrix<T> operator+(Matrix<T> other) const{
+        if(this->columns!=other.columns || this->rows!=other.rows)
+            throw invalid_argument("Different sizes");
+        Matrix<T> answer(columns,rows);
+        for(int i=0;i<columns;i++){
+            auto temp1=(*(this->row))[i];
+            auto temp2=(*(other.row))[i];
+            auto temp3=temp1->down;
+            auto temp4=temp2->down;
+            while(temp3 || temp4){
+                if(temp3 && temp4){
+                    if(temp3->posy < temp4->posy){
+                        answer.set(temp3->posx,temp3->posy,temp3->value);
+                        temp3=temp3->down;
+                    }
+                    else{
+                        if(temp3->posy > temp4->posy){
+                            answer.set(temp4->posx,temp4->posy,temp4->value);
+                            temp4=temp4->down;
+                        }
+                        else{
+                            answer.set(temp4->posx,temp4->posy,(temp4->value)+(temp3->value));
+                            temp3=temp3->down;
+                            temp4=temp4->down;
+                        }
+                    }
+                }
+                else{
+                    while(temp3){
+                        answer.set(temp3->posx,temp3->posy,temp3->value);
+                        temp3=temp3->down;
+                    }
+                    while(temp4){
+                        answer.set(temp4->posx,temp4->posy,temp4->value);
+                        temp4=temp4->down;
+                    }
+                }
+            }
+        }
+        return answer;
+    };
+
+    Matrix<T> operator-(Matrix<T> other) const{
+        if(this->columns!=other.columns || this->rows!=other.rows)
+            throw invalid_argument("Different sizes");
+        Matrix<T> answer(columns,rows);
+        for(int i=0;i<columns;i++){
+            auto temp1=(*(this->row))[i];
+            auto temp2=(*(other.row))[i];
+            auto temp3=temp1->down;
+            auto temp4=temp2->down;
+            while(temp3 || temp4){
+                if(temp3 && temp4){
+                    if(temp3->posy < temp4->posy){
+                        answer.set(temp3->posx,temp3->posy,temp3->value);
+                        temp3=temp3->down;
+                    }
+                    else{
+                        if(temp3->posy > temp4->posy){
+                            answer.set(temp4->posx,temp4->posy,temp4->value);
+                            temp4=temp4->down;
+                        }
+                        else{
+                            answer.set(temp4->posx,temp4->posy,(temp4->value)-(temp3->value));
+                            temp3=temp3->down;
+                            temp4=temp4->down;
+                        }
+                    }
+                }
+                else{
+                    while(temp3){
+                        answer.set(temp3->posx,temp3->posy,temp3->value);
+                        temp3=temp3->down;
+                    }
+                    while(temp4){
+                        answer.set(temp4->posx,temp4->posy,temp4->value);
+                        temp4=temp4->down;
+                    }
+                }
+            }
+        }
+
+
+
+        return answer;
+    };
+
+    Matrix<T> transpose() const{
+        Matrix<T> answer(columns,rows);
+        for(auto it:(*column)){
+            auto it2=it->next;
+            while (it2){
+                answer.set(it2->posy,it2->posx,it2->value);
+                it2=it2->next;
+            }
+        }
+        return answer;
+    };
+
+    void print() const{
+        for (auto it:(*column)){
             int contador=0;
             auto it2=it->next;
             while (it2){
-                for (int i=contador;i<it2->posx;i++){
+                for (int i=contador;i<it2->posx;i++)
                     cout<<0<<" ";
-                }
-                cout<<*(it2->value)<<" ";
+                cout<<(it2->value)<<" ";
                 contador=it2->posx+1;
                 it2=it2->next;
             }
@@ -156,17 +295,7 @@ void print(){
             }
             cout<<endl;
         }
-    }
-
-
-
-    T operator()(unsigned, unsigned) const;
-    Matrix<T> operator*(T scalar) const;
-    Matrix<T> operator*(Matrix<T> other) const;
-    Matrix<T> operator+(Matrix<T> other) const;
-    Matrix<T> operator-(Matrix<T> other) const;
-    Matrix<T> transpose() const;
-    //void print() const{    };
+    };
 
     //~Matrix();
 };

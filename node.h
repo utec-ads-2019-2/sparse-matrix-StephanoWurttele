@@ -6,21 +6,27 @@ class Matrix;
 
 template <typename T>
 class Node {
-private:
 protected:
-    T nvalue;
     Node<T> *next, *down;
-    int posx=0,posy=0;
-    T* value;
+    unsigned int posx=0,posy=0;
+    T value;
+    void build(unsigned int x, unsigned int y, T valor, Node<T>* nnext, Node<T>* ddown){
+        this->posx=x;
+        this->posy=y;
+        this->next=nnext;
+        this->down=ddown;
+        this->value=valor;
+    }
 public:
     Node(){
         posx=-1;
         posy=-1;
-        value=nullptr;
+        value=-1;
+        down=nullptr;
+        next=nullptr;
     }
-    Node (unsigned int posx, unsigned int posy,T valuee):next(nullptr),down(nullptr),posx(posx),posy(posy){
-        nvalue=valuee;
-        value=&nvalue;
+    Node (unsigned int _posx, unsigned int _posy,T _value){
+        build(_posx,_posy,_value,nullptr,nullptr);
     };
     void set_down(Node<T> nodo){
         down=nodo;
@@ -28,7 +34,15 @@ public:
     void set_next(Node<T> nodo){
         down=nodo;
     }
-
+    Node(const Node<T>& other){
+        build(other.posx,other.posy,other.value,other.next,other.down);
+    }
+    Node<T>& operator=(Node<T>& other){
+        cout<<"Operador ="<<endl;
+        cout<<other.posx<<" "<<other.posy<<" "<<other.value<<" "<<other.next<<" "<<other.down<<endl;
+        build(other.posx,other.posy,other.value,other.next,other.down);
+        return *this;
+    }
     friend class Matrix<T>;
 };
 
