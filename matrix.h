@@ -62,7 +62,7 @@ public:
                 temp2->next=inserted;
             }
     }
-    void delNode(unsigned x,unsigned y){
+    void delNode(unsigned x,unsigned y){        
         Node<T>* temp=(*row)[x];
         if(temp->down){
             if(temp->posy!=y){
@@ -106,7 +106,6 @@ public:
             row->push_back(new Node<T>());
         }
     };
-
     void set(unsigned x, unsigned y, T data){
         if(x>=columns || y>=rows)
             throw out_of_range("Out of range");
@@ -119,7 +118,6 @@ public:
         }
     
     };
-
     T operator()(unsigned column, unsigned row) const{
         if(row<rows && column < columns){
             Node<T>* temp = (*(this->row))[column];           
@@ -129,11 +127,18 @@ public:
                 }
                 temp=temp->down;
             }
-            throw invalid_argument("There is no element in this position");
+            return 0;
         }else
             throw out_of_range("Out of range");
     };
-    
+    Matrix<T>& operator=(Matrix<T> other){
+        for(int i = 0; i < other.columns; i++ ){
+            for(int j = 0; j < other.rows ; j++){
+                this->set(i,j,other(i,j));
+            }
+        }
+        return *this;
+    };
     Matrix<T> operator*(T scalar) const{
         Matrix<T> answer(columns,rows);
         for(auto it:(*column)){
@@ -145,8 +150,7 @@ public:
         }
         return answer;
     };
-
-    Matrix<T> operator*(Matrix<T> other) const{
+    Matrix<T> operator*(Matrix<T>& other) const{
         if(this->rows!=other.columns)
             throw invalid_argument("Invalid sizes");
         Matrix<T> answer(rows,rows);
@@ -158,7 +162,6 @@ public:
                 auto temp4=temp2->down;
                 T temp=0;
                 while(temp3 && temp4){
-                    cout<<"Temp 3 value is "<<temp3->value<<" and temp4 value is "<<temp4->value<<endl;
                     if(temp3->posx>temp4->posy){
                         temp4=temp4->down;
                     }
@@ -179,8 +182,7 @@ public:
         }
         return answer;
     };
-
-    Matrix<T> operator+(Matrix<T> other) const{
+    Matrix<T> operator+(Matrix<T>& other) const{
         if(this->columns!=other.columns || this->rows!=other.rows)
             throw invalid_argument("Different sizes");
         Matrix<T> answer(columns,rows);
@@ -221,8 +223,7 @@ public:
         }
         return answer;
     };
-
-    Matrix<T> operator-(Matrix<T> other) const{
+    Matrix<T> operator-(Matrix<T>& other) const{
         if(this->columns!=other.columns || this->rows!=other.rows)
             throw invalid_argument("Different sizes");
         Matrix<T> answer(columns,rows);
@@ -266,7 +267,6 @@ public:
 
         return answer;
     };
-
     Matrix<T> transpose() const{
         Matrix<T> answer(columns,rows);
         for(auto it:(*column)){
@@ -278,7 +278,6 @@ public:
         }
         return answer;
     };
-
     void print() const{
         for (auto it:(*column)){
             int contador=0;
@@ -297,7 +296,14 @@ public:
         }
     };
 
-    //~Matrix();
+    ~Matrix(){
+        for(int i = 0 ; i < columns ; i++){
+            Node<T>* temp=(*row)[i];
+            temp->destroySelf();
+        }
+        delete row;
+        delete column;
+    };
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H

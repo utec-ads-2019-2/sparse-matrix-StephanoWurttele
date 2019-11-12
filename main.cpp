@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "tester/tester.h"
-
+#include "mocker/mocker.h"
 int main() {
     //Tester::execute();
     Matrix<int> SparseMatrix(4,4);
@@ -48,7 +48,6 @@ int main() {
     
     SparseMatrix.print();
     cout<<endl;
-    
     //Operations{}
         cout<<"OPERATIONS:"<<endl;
 
@@ -97,8 +96,6 @@ int main() {
         auto product2=SparseMatrix*newproduct;
         product2.print();
         cout<<endl;
-
-
         cout<<endl<<endl;
         cout<<"() operator: "<<newproduct(1,0)<<endl;
         
@@ -106,7 +103,7 @@ int main() {
         auto newsparse=SparseMatrix.transpose();
         newsparse.print();
         cout<<endl<<endl;
-        
+    
     return EXIT_SUCCESS;
 }
 

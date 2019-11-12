@@ -28,34 +28,28 @@ public:
     Node (unsigned int _posx, unsigned int _posy,T _value){
         build(_posx,_posy,_value,nullptr,nullptr);
     };
-    void set_down(Node<T> nodo){
-        down=nodo;
-    }
-    void set_next(Node<T> nodo){
-        down=nodo;
-    }
     Node(const Node<T>& other){
         build(other.posx,other.posy,other.value,other.next,other.down);
     }
     Node<T>& operator=(Node<T>& other){
-        cout<<"Operador ="<<endl;
-        cout<<other.posx<<" "<<other.posy<<" "<<other.value<<" "<<other.next<<" "<<other.down<<endl;
+        std::cout<<"Operador ="<<std::endl;
+        std::cout<<other.posx<<" "<<other.posy<<" "<<other.value<<" "<<other.next<<" "<<other.down<<std::endl;
         build(other.posx,other.posy,other.value,other.next,other.down);
         return *this;
     }
     friend class Matrix<T>;
+
+
+    void destroySelf(){
+        if(next){
+            next->destroySelf();
+            next=nullptr;
+        }
+    }
+    ~Node(){
+        
+    }
 };
 
-template <typename T>
-class Root{
-    Node<T> *next;
-    Node<T> *down;
-    public:
-    Root (){
-        next=nullptr;
-        down=nullptr;
-    }
-    friend class Matrix<T>;
-};
 
 #endif //SPARSE_MATRIX_NODE_H
