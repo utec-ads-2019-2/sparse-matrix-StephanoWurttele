@@ -3,8 +3,8 @@
 #include "tester/tester.h"
 #include "mocker/mocker.h"
 int main() {
-    //Tester::execute();
-    Matrix<int> SparseMatrix(4,4);
+    Tester::execute();
+    /*Matrix<int> SparseMatrix(4,4);
     //adding nodes{}
         SparseMatrix.set(0,0,1);
         cout<<"Node 1 added"<<endl;
@@ -102,7 +102,7 @@ int main() {
         cout<<"Transpose:"<<endl;
         auto newsparse=SparseMatrix.transpose();
         newsparse.print();
-        cout<<endl<<endl;
+        cout<<endl<<endl;*/
     
     return EXIT_SUCCESS;
 }

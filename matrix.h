@@ -139,6 +139,9 @@ public:
         }
         return *this;
     };
+
+    // No usar los punteros directamente afecta el performance
+
     Matrix<T> operator*(T scalar) const{
         Matrix<T> answer(columns,rows);
         for(auto it:(*column)){

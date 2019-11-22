@@ -45,6 +45,8 @@ public:
             next->destroySelf();
             next=nullptr;
         }
+
+        // No estás borrando, dónde está el delete?
     }
     ~Node(){
         
